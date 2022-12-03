@@ -49,9 +49,9 @@ for session in sessions:
       ranking['total'] = {name: sum(p.get(name, 0) for p in ranking.values()) for name in players.keys()}
 
       # group by player
-      header = ['player'] + list(ranking.keys())
+      header = ['Players'] + list(ranking.keys())
       data = [
-        {'player': player} | {
+        {'Players': player} | {
           puzzle:scores.get(player)
           for puzzle,scores in ranking.items()
           if player in scores

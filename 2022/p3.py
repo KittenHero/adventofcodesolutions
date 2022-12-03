@@ -13,9 +13,10 @@ def main(data, raw):
 def priority(item):
   return ord(item) + (1 - ord('a') if 'a' <= item <= 'z' else 27 - ord('A'))
 
-def common(*iterables):
-  first, *rest = iterables
-  return next(item for item in first if all(item in bag for bag in rest))
+def common(*bags):
+  c = reduce(lambda a, b: set(a) & set(b), bags)
+  assert len(c) == 1
+  return c.pop()
 
 def half_split(bag):
   mid = len(bag) // 2
