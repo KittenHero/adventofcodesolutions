@@ -30,6 +30,9 @@ def get_todays_input(session):
       f.write(response.text)
     return response.text
 
+def get_all_ints(line):
+  return [int(x) for x in re.findall('-?\d+', line)]
+
 def submit_todays_answer(session, level, answer):
     today = datetime.now()
     url = f'https://adventofcode.com/{today.year}/day/{today.day}/answer'

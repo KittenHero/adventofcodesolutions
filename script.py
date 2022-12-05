@@ -7,7 +7,7 @@ def main(data, raw):
 if __name__ == '__main__':
   raw = '''
 
-'''.strip()
+'''.strip('\n')
 
   sample = to_data(raw)
   for ans in main(sample, raw):
