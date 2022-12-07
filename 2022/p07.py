@@ -24,7 +24,7 @@ def main(data, raw):
         all_dirs.append(current)
       case ['dir', name]:
         current.dirs[name] = Dir(parent=current)
-      case [size, name]:
+      case [size, name] if size.isdigit():
         current.files[name] = int(size)
   
   yield sum(size for d in all_dirs if (size := len(d)) <= 100000)
