@@ -9,6 +9,7 @@ from pprint import pprint
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
+from dataclasses import dataclass
 
 def read(name):
   with open(name) as f:
