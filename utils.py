@@ -1,3 +1,4 @@
+from typing import *
 from collections import *
 from datetime import *
 from itertools import *
@@ -10,6 +11,8 @@ import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
+import copy
+import math
 
 def read(name):
   with open(name) as f:
@@ -42,6 +45,13 @@ def submit_todays_answer(session, level, answer):
     response = requests.post(url, data, cookies={'session': session})
     root = BeautifulSoup(response.text, 'html.parser')
     print(root.find('main').text.strip())
+
+ops = {
+  '+': op.add,
+  '*': op.mul,
+  '-': op.sub,
+  '/': op.truediv,
+}
 
 # data/sessions.py: sessions = ['...']
 from data.sessions import sessions
