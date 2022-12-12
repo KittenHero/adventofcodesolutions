@@ -2,7 +2,7 @@ from utils import *
 
 
 def main(data, raw):
-    yield ...
+  yield ...
 
 if __name__ == '__main__':
   raw = '''
