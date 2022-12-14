@@ -1,6 +1,6 @@
 from utils import *
 
-def sand_fall_positions(x, y):
+def fall_steps(x, y):
   yield x, y + 1
   yield x - 1, y + 1
   yield x + 1, y + 1
@@ -8,17 +8,25 @@ def sand_fall_positions(x, y):
 def has_support(x, y, grid):
   return any(x == px and py > y for px, py in grid)
 
-def has_floor_support(x, y, grid):
-  floor = 2 + max(y for (x, y), item in grid.items() if item == '#')
-  return floor > y + 1
+def has_floor_support(floor):
 
-def next_fall(sand, grid, has_support):
+  def has_support(x, y, grid):
+    return floor > y + 1
+  
+  return has_support
+
+def next_step(sand, grid, has_support):
   if not has_support(*sand, grid):
     return
-  for step in sand_fall_positions(*sand):
+  for step in fall_steps(*sand):
     if step in grid:
       continue
     return step
+
+def sand_fall(sand, grid, has_support):
+  while (step := next_step(sand, grid, has_support)):
+    sand = step
+  return sand
 
 def main(data, raw):
   grid = {}
@@ -35,21 +43,17 @@ def main(data, raw):
   
   source = 500, 0
   for i in count():
-    sand = source
-    while (falling := next_fall(sand, grid, has_support)):
-      sand = falling
+    sand = sand_fall(source, grid, has_support)
     if not has_support(*sand, grid):
       break
     grid[sand] = 'o'
   
   yield i
+  floor = floor = 2 + max(y for (x, y), item in grid.items() if item == '#')
   for j in count():
     if source in grid:
       break
-    sand = source
-    while (falling := next_fall(sand, grid, has_floor_support)):
-      sand = falling
-    grid[sand] = 'o'
+    grid[sand_fall(source, grid, has_floor_support(floor))] = 'o'
   yield i + j
 
 
