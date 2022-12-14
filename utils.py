@@ -46,6 +46,19 @@ def submit_todays_answer(session, level, answer):
     root = BeautifulSoup(response.text, 'html.parser')
     print(root.find('main').text.strip())
 
+@singledispatch
+def print_grid(grid: dict):
+  startx = min(x for x, y in grid)
+  starty = min(y for x, y in grid)
+  stopx = 2 + max(x for x, y in grid)
+  stopy = 2 + max(y for x, y in grid)
+
+  print('\n'.join(''.join(grid.get((x, y), ' ') for x in range(startx, stopx)) for y in range(starty, stopy)))
+
+@print_grid.register
+def print_grid_list(grid: list):
+  print('\n'.join(''.join(cell for cell in row) for row in range(grid)))
+
 ops = {
   '+': op.add,
   '*': op.mul,
