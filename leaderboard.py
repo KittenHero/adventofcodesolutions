@@ -69,6 +69,6 @@ for session in sessions:
         print('Install pandoc for better output', file=stderr)
         print(csv)
       else:
-        child = run(['pandoc', '-f', 'csv', '-t', 'markdown'], input=csv, text=True)
+        child = run(['pandoc', '-f', 'csv', '-t', 'markdown' if days < 12 else 'html'], input=csv, text=True)
         child.check_returncode()
         print()
