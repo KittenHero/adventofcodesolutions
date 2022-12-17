@@ -14,6 +14,8 @@ from dataclasses import dataclass
 import copy
 import math
 
+today = datetime.now()
+
 def read(name):
   with open(name) as f:
     return [l.strip() for l in f.readlines()]
@@ -22,7 +24,6 @@ def to_data(txt):
   return [l.strip() for l in txt.split('\n')]
 
 def get_todays_input(session, year=0, day=0):
-  today = datetime.now()
   year = year or today.year
   day = day or today.day
   url = f'https://adventofcode.com/{year}/day/{day}/input'
@@ -40,7 +41,6 @@ def get_all_ints(line):
   return [int(x) for x in re.findall('-?\d+', line)]
 
 def submit_todays_answer(session, level, answer, year=0, day=0):
-  today = datetime.now()
   year = year or today.year
   day = day or today.day
   url = f'https://adventofcode.com/{year}/day/{day}/answer'
@@ -53,10 +53,10 @@ def submit_todays_answer(session, level, answer, year=0, day=0):
 def print_grid(grid: dict):
   startx = min(x for x, y in grid)
   starty = min(y for x, y in grid)
-  stopx = 2 + max(x for x, y in grid)
-  stopy = 2 + max(y for x, y in grid)
+  stopx = 1 + max(x for x, y in grid)
+  stopy = 1 + max(y for x, y in grid)
 
-  print('\n'.join(''.join(grid.get((x, y), ' ') for x in range(startx, stopx)) for y in range(starty, stopy)))
+  print('\n'.join(''.join(grid.get((x, y), '.') for x in range(startx, stopx)) for y in range(starty, stopy)))
 
 @print_grid.register
 def print_grid_list(grid: list):

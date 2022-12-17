@@ -25,39 +25,46 @@ def main(data, raw):
       valves[name] = rate
 
   dist = shortest_paths(rooms)
+  start_room = 'AA'
+  start_time = 30
 
-  @lru_cache
-  def max_flow(flow, time, current, unopened):
-    return max(
-      (
-        max_flow(
-          flow + valves[dst] * remain,
-          remain, dst, unopened - {dst}
-        )
-        for dst in unopened
-        if (remain := time - dist[current][dst] - 1) > 0
-      ),
-      default=flow
-    )
+  order = {key: i for i, key in enumerate(valves)}
+  if start_room not in order:
+    order[start_room] = len(valves)
+  # list is ~4x faster than dict
+  cache = [None]*2*31*len(order)*(2 << len(valves))
+  def key(time, current, unopened, other):
+    return other + 2*time + 2*31*order[current] + 2*31*len(order)*sum(1 << order[dst] for dst in unopened)
 
-  yield max_flow(0, 30, 'AA', frozenset(valves))
+  def max_flow(time, current, unopened, other):
+    if all(dist[current][dst] + 1 >= time for dst in unopened):
+      if not other:
+        return 0
+      else:
+        return max_flow(start_time, start_room, unopened, other - 1)
 
-  def partitions(valves):
-    n = len(valves)
-    progress = [0] + [math.comb(n, i) for i in range(1, n//2 + 1)]
-    for cardinality in range(1, n//2 + 1):
-      for subset in combinations(valves, cardinality):
-        # capture generator so it can be iterated multiple times
-        subset = frozenset(subset)
-        yield subset, frozenset(valves) - subset
-      print(f'{progress[cardinality]/sum(progress):.2%} ({progress[cardinality]} / {sum(progress)})', end='\r')
-    print()
+    k = key(time, current, unopened, other)
+    if cache[k] is None:
+      cache[k] = max(
+        chain(
+          # do nothing (for part 2)
+          [max_flow(0, current, unopened, other)],
+          # open valve
+          (
+            valves[dst] * remain
+            + max_flow(remain, dst, unopened - {dst}, other)
+            for dst in unopened
+            if (remain := time - dist[current][dst] - 1) > 0
+          ),
+        ),
+        default=0
+      )
+    return cache[k]
 
-  yield max(
-    max_flow(0, 26, 'AA', subset)
-    + max_flow(0, 26, 'AA', complement)
-    for subset, complement in partitions(valves)
-  )
+  yield max_flow(start_time, start_room, frozenset(valves), 0)
+  start_time = 26
+  yield max_flow(start_time, start_room, frozenset(valves), 1)
+
 
 if __name__ == '__main__':
   raw = '''
