@@ -16,7 +16,7 @@ if __name__ == '__main__':
   if args.solution:
     args.day = args.solution
     args.dry_run = True
-    m = importlib.import_module(f'{args.year}.p{args.day}')
+    m = importlib.import_module(f'{args.year}.p{args.day:02}')
     main = m.main
 
   for session in sessions:
