@@ -21,10 +21,12 @@ def read(name):
 def to_data(txt):
   return [l.strip() for l in txt.split('\n')]
 
-def get_todays_input(session):
+def get_todays_input(session, year=0, day=0):
   today = datetime.now()
-  url = f'https://adventofcode.com/{today.year}/day/{today.day}/input'
-  cache = f'data/{today.year}.{today.day}.{session[-3:]}.input'
+  year = year or today.year
+  day = day or today.day
+  url = f'https://adventofcode.com/{year}/day/{day}/input'
+  cache = f'data/{year}.{day}.{session[-3:]}.input'
   try:
     with open(cache, 'r') as f:
       return f.read()
@@ -37,14 +39,15 @@ def get_todays_input(session):
 def get_all_ints(line):
   return [int(x) for x in re.findall('-?\d+', line)]
 
-def submit_todays_answer(session, level, answer):
-    today = datetime.now()
-    url = f'https://adventofcode.com/{today.year}/day/{today.day}/answer'
-
-    data = { 'level': level, 'answer': answer }
-    response = requests.post(url, data, cookies={'session': session})
-    root = BeautifulSoup(response.text, 'html.parser')
-    print(root.find('main').text.strip())
+def submit_todays_answer(session, level, answer, year=0, day=0):
+  today = datetime.now()
+  year = year or today.year
+  day = day or today.day
+  url = f'https://adventofcode.com/{year}/day/{day}/answer'
+  data = { 'level': level, 'answer': answer }
+  response = requests.post(url, data, cookies={'session': session})
+  root = BeautifulSoup(response.text, 'html.parser')
+  print(root.find('main').text.strip())
 
 @singledispatch
 def print_grid(grid: dict):
