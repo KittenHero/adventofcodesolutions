@@ -1,7 +1,6 @@
 from utils import *
 from script import main
 import importlib
-import time
 from argparse import ArgumentParser
 import sys
 
@@ -22,10 +21,7 @@ if __name__ == '__main__':
   for session in sessions:
     raw = get_todays_input(session, day=args.day, year=args.year).strip()
     data = to_data(raw)
-    start = time.process_time_ns()
     ans = list(main(data, raw))
-    end = time.process_time_ns()
     print(f'{ans = }')
-    print(f'elapsed: {(end - start) * 1e-9:.2f} CPU sec')
     if not args.dry_run:
       submit_todays_answer(session, len(ans), ans[-1], day=args.day, year=args.year)

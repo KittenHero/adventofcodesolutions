@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass
 import copy
 import math
+import time
 
 today = datetime.now()
 
@@ -61,6 +62,21 @@ def print_grid(grid: dict):
 @print_grid.register
 def print_grid_list(grid: list):
   print('\n'.join(''.join(cell for cell in row) for row in range(grid)))
+
+def timing(f):
+  '''Usage:
+  @timing
+  def main(...):
+    ...
+  '''
+  @wraps(f)
+  def wrap(*args, **kw):
+    ts = time.process_time_ns()
+    yield from f(*args, **kw)
+    te = time.process_time_ns()
+    print(f'Elapsed: {(te - ts) * 1e-9:.2f} CPU sec`')
+
+  return wrap
 
 ops = {
   '+': op.add,
