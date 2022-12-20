@@ -67,6 +67,9 @@ def max_geode(time, blueprint, mats=Resource(), bots=Robots(ore=1)):
       dmat =  mats + bots * dt - bp
       dbots = bots.build(bot)
       heapq.heappush(q, (-1*dmat, remain, dmat, dbots))
+      # prioritize geode if can materials available
+      if dt == 1 and bp == blueprint.geode:
+        break
   return best_geode
 
 
