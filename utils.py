@@ -74,7 +74,7 @@ def timing(f):
     ts = time.process_time_ns()
     yield from f(*args, **kw)
     te = time.process_time_ns()
-    print(f'Elapsed: {(te - ts) * 1e-9:.2f} CPU sec`')
+    print(f'Elapsed: {(te - ts) * 1e-9:.2f} CPU sec')
 
   return wrap
 
