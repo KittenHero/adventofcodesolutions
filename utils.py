@@ -51,13 +51,22 @@ def submit_todays_answer(session, level, answer, year=0, day=0):
   print(root.find('main').text.strip())
 
 @singledispatch
-def print_grid(grid: dict):
+def print_grid(grid: dict, empty='.'):
   startx = min(x for x, y in grid)
   starty = min(y for x, y in grid)
   stopx = 1 + max(x for x, y in grid)
   stopy = 1 + max(y for x, y in grid)
 
-  print('\n'.join(''.join(grid.get((x, y), '.') for x in range(startx, stopx)) for y in range(starty, stopy)))
+  print('\n'.join(''.join(grid.get((x, y), empty) for x in range(startx, stopx)) for y in range(starty, stopy)))
+
+@singledispatch
+def print_cgrid(grid: dict, empty='.'):
+  startx = min(int(p.real) for p in grid)
+  starty = min(int(p.imag) for p in grid)
+  stopx = 1 + max(int(p.real) for p in grid)
+  stopy = 1 + max(int(p.imag) for p in grid)
+
+  print('\n'.join(''.join(grid.get(x + 1j*y, empty) for x in range(startx, stopx)) for y in range(starty, stopy)))
 
 @print_grid.register
 def print_grid_list(grid: list):

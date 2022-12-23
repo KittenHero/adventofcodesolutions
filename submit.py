@@ -19,7 +19,7 @@ if __name__ == '__main__':
     main = m.main
 
   for session in sessions:
-    raw = get_todays_input(session, day=args.day, year=args.year).strip()
+    raw = get_todays_input(session, day=args.day, year=args.year)
     data = to_data(raw)
     ans = list(main(data, raw))
     print(f'{ans = }')
