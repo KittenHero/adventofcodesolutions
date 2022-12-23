@@ -8,13 +8,12 @@ def has_neighbor(elf, elves):
   )
 
 def propose(e, elves, directions):
-  return next(
-    (
-      d for d in directions
-      if all(p not in elves for p in [e + d, e + d + 1j*d, e + d - 1j*d])
-    ),
-    0
-  )
+  for d in directions:
+    if all(
+      p not in elves for p in [e + d, e + d + 1j*d, e + d - 1j*d]
+    ):
+      return d
+  return 0
 
 @timing
 def main(data, raw):
@@ -42,7 +41,7 @@ def main(data, raw):
     )
     directions.rotate(-1)
 
-    if r == 20:
+    if r == 10:
       width = 1 + max(int(p.real) for p in moved) - min(int(p.real) for p in moved)
       height = 1 + max(int(p.imag) for p in moved) - min(int(p.imag) for p in moved)
       yield width * height - len(moved)
