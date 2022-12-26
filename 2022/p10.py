@@ -16,9 +16,9 @@ def main(data, raw):
 
   yield sum([x[cycle-1]*cycle for cycle in samples])
 
-  screen = ['#' if abs((i % 40) - v) <= 1 else ' ' for i, v in enumerate(x)]
-  print('\n'.join(''.join(row) for row in chunk(screen, 40)))
-  # submit part 2 manually
+  screen = ['#' if abs((i % 40) - v) <= 1 else '.' for i, v in enumerate(x)]
+  yield aoc_ocr('\n'.join(''.join(row) for row in chunk(screen, 40)))
+
 
 if __name__ == '__main__':
   raw = '''

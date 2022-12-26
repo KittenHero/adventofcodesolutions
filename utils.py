@@ -94,5 +94,21 @@ ops = {
   '/': op.truediv,
 }
 
+from aoc_ocr import aoc_ocr_data, width, height
+
+def aoc_ocr(text, *, fill='#', blank='.'):
+  text = text.replace(fill, '#').replace(blank, '.')
+  lines = text.split('\n')
+  w = len(lines[0])
+  h = len(lines)
+  assert h == height and all(len(l) == w for l in lines)
+  return ''.join(
+    aoc_ocr_data[
+        '\n'.join(l[start:start+4] for l in lines)
+    ]
+    for start in range(0, w, width + 1)
+  )
+
+
 # data/sessions.py: sessions = ['...']
 from data.sessions import sessions
