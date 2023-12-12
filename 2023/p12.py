@@ -15,7 +15,7 @@ def main(data, raw):
     if row
   )
 
-@cache
+@lru_cache(maxsize=512)
 def possible(row, expected, pos=0, count=0, validated=0):
   if pos == len(row):
     return (
