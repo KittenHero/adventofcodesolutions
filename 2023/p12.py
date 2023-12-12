@@ -15,38 +15,40 @@ def main(data, raw):
     if row
   )
 
-@lru_cache(maxsize=512)
-def possible(row, expected, pos=0, count=0, validated=0):
-  if pos == len(row):
-    return (
-      validated == len(expected) and not count
-      or validated + 1 == len(expected) and count == expected[validated]
-    )
-
-  # too many '#'
-  if (
-    count and validated == len(expected)
-    or validated < len(expected) and count > expected[validated]
-  ):
-    return 0
-
-  def possible_damaged():
-    return possible(row, expected, pos + 1, count + 1, validated)
-
-  def possible_operational():
-    if not count:
-      return possible(row, expected, pos + 1, 0, validated)
-    if count and count == expected[validated]:
-      return possible(row, expected, pos + 1, 0, validated + 1)
-    else:
+def possible(row, expected):
+  @cache
+  def count_possible(pos, count, validated):
+    if pos == len(row):
+      return (
+        validated == len(expected) and not count
+        or validated + 1 == len(expected) and count == expected[validated]
+      )
+    # too many '#'
+    if (
+      count and validated == len(expected)
+      or validated < len(expected) and count > expected[validated]
+    ):
       return 0
 
-  if row[pos] == '#':
-    return possible_damaged()
-  if row[pos] == '.':
-    return possible_operational()
-  if row[pos] == '?':
-    return possible_damaged() + possible_operational()
+    def possible_damaged():
+      return count_possible(pos + 1, count + 1, validated)
+
+    def possible_operational():
+      if not count:
+        return count_possible(pos + 1, 0, validated)
+      if count and count == expected[validated]:
+        return count_possible(pos + 1, 0, validated + 1)
+      else:
+        return 0
+
+    if row[pos] == '#':
+      return possible_damaged()
+    if row[pos] == '.':
+      return possible_operational()
+    if row[pos] == '?':
+      return possible_damaged() + possible_operational()
+
+  return count_possible(0, 0, 0)
 
 raw = '''
 ???.### 1,1,3
