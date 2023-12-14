@@ -71,7 +71,7 @@ def print_cgrid(grid: dict, empty='.'):
 
 @print_grid.register
 def print_grid_list(grid: list):
-  print('\n'.join(''.join(cell for cell in row) for row in range(grid)))
+  print('\n'.join(''.join(cell for cell in row) for row in grid))
 
 def timing(f):
   '''Usage:
