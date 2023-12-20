@@ -11,7 +11,7 @@ from pprint import pprint
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
-from dataclasses import dataclass
+from dataclasses import dataclass, replace as dataclass_replace
 import copy
 import math
 import time
