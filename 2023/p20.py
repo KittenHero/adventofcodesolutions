@@ -76,3 +76,75 @@ if __name__ == '__main__':
   sample = to_data(raw)
   for ans in main(sample, raw):
     print(ans)
+
+
+manual_solution = '''
+broadcaster -> sj, sr, tp, nk
+
+0b111100101001 = 3881
+%sj -> kj, rb       1
+%kj -> fk           0
+%fk -> xh           0
+%xh -> zs, rb       1
+%zs -> ct           0
+%ct -> rt, rb       1
+%rt -> hq           0
+%hq -> bb           0
+%bb -> kf, rb       1
+%kf -> rb, ph       1
+%ph -> rb, hx       1
+%hx -> rb           1
+&rb -> vc, zs, fk, hq, rt, sj, kj
+&vc -> lg
+
+0b111100001011 = 3851
+%sr -> vs, ml       1
+%vs -> tq, ml       1
+%tq -> jm           0
+%jm -> ml, kp       1
+%kp -> vk           0
+%vk -> tk           0
+%tk -> sh           0
+%sh -> zk           0
+%zk -> ml, ps       1
+%ps -> qz, ml       1
+%qz -> ml, kh       1
+%kh -> ml           1
+&ml -> kp, sr, tq, nb, tk, sh, vk
+&nb -> lg
+
+0b111101100111 = 3943
+%tp -> gp, lx       1
+%lx -> ff, gp       1
+%ff -> gp, df       1
+%df -> nv           0
+%nv -> xm           0
+%xm -> gp, cq       1
+%cq -> gp, mq       1
+%mq -> pr           0
+%pr -> gp, pf       1
+%pf -> gp, nt       1
+%nt -> gs, gp       1
+%gs -> gp           1
+&gp -> df, ls, mq, tp, nv
+&ls -> lg
+
+0b111101011011 = 3931
+%nk -> nn, bt       1
+%nn -> xf, bt       1
+%xf -> qr           0
+%qr -> bt, zt       1
+%zt -> pb, bt       1
+%pb -> kq           0
+%kq -> tl, bt       1
+%tl -> bn           0
+%bn -> sv, bt       1
+%sv -> dx, bt       1
+%dx -> bt, tz       1
+%tz -> bt           1
+&bt -> tl, nk, pb, xf, vg
+&vg -> lg
+
+LCM(3881, 3851, 3931, 3943) = 231657829136023
+&lg -> rx
+'''
