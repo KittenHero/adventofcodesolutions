@@ -2,106 +2,77 @@ from utils import *
 
 @timing
 def main(data, raw):
-  h = sum(map(bool, data))
-  w = len(data[0])
-  s = next(x + 1j * y for y, row in enumerate(data) if row for x, ch in enumerate(row) if ch == 'S')
-  rocks = set(x + 1j * y for y, row in enumerate(data) if row for x, ch in enumerate(row) if ch == '#')
+  bricks = fall([Brick(*get_all_ints(row)) for row in data if row])
+  reactions = {b: reaction(b, bricks) for b in bricks}
+  yield sum(not reaction for reaction in reactions.values())
+  yield sum(map(len, reactions.values()))
 
-  y = []
-  reachable = Reachable({s}, set())
-  for i in range(131*2 + 65):
-    if i == 64:
-      yield len(reachable)
-    reachable = reachable.step(rocks, w, h)
+def fall(bricks):
+  class Support(NamedTuple):
+    supporting: Set[Brick]
+    supported: Set[Brick]
 
-  n = 26501365
-  # there is a clear path in cardinal directions
-  assert all(s.real + 1j*k not in rocks for k in range(h)) and all(k + 1j*s.imag not in rocks for k in range(w))
-  # edges are clear
-  assert all(1j*k not in rocks and w - 1 + 1j*k not in rocks for k in range(h)) and all(k not in rocks and k + 1j*(h-1) not in rocks for k in range(w))
-  # there are paths with width 5 connecting midpoints of adjacent edges
-  assert all(
-    (s.real - k - q)%w + 1j*(k%h) not in rocks
-    and (s.real + k + q)%w+ 1j*(k%h) not in rocks
-    for k in range(h) for q in range(-2, 3)
-  )
-  assert w == h == 131 and s == 65 + 65j and (n - 65) % 131 == 0 and (n // 131) % 2 == 0
-  yield extrapolate(subdivide(reachable, w), n//131)
+  grid = {}
+  supports = {}
 
+  for b in sorted(bricks, key=lambda b: b.z):
+    while b.z > 0 and all(p not in grid for p in b.voxels):
+      b = b.shift(dz=-1)
+    b = b.shift(dz=1)
+    supports[b] = Support(set(), set())
+    for p in b.shift(dz=-1).voxels:
+      if p not in grid: continue
+      supports[grid[p]].supporting.add(b)
+      supports[b].supported.add(grid[p])
+    grid |= {p: b for p in b.voxels}
+  return supports
 
-def subdivide(reachable, w):
-  super_grid = defaultdict(int)
-  for p in reachable:
-    z = p.real//w + 1j*(p.imag//w)
-    super_grid[z] += 1
-  return super_grid
+def reaction(to_remove, supports):
+  stack = [to_remove]
+  falling = set()
+  while stack:
+    cur = stack.pop()
+    falling.add(cur)
+    for b in supports[cur].supporting:
+      if not supports[b].supported.issubset(falling): continue
+      stack.append(b)
+  return falling - {to_remove}
 
-def extrapolate(super_grid, n):
-  '''
-      _
-    _|_|_
-  _|_|_|_|_
- |_|_|_|_|_|
-  _|_|_|_|_
-    _|_|_
-      _
-  '''
-  corners = sum(super_grid[c] for c in [2, 2j, -2, -2j])
-  edge_even = sum(super_grid[c] for c in [2+1j, -1+2j, -2-1j, 1-2j])
-  edge_odd = sum(super_grid[c] for c in [1+1j, 1-1j, -1+1j, -1-1j])
-  middle_odd = super_grid[0]
-  middle_even = super_grid[1]
-  assert edge_even == sum(super_grid[c] for c in [2-1j, -1-2j, -2+1j, 1+2j])
-  assert middle_even == super_grid[-1] == super_grid[1j] == super_grid[-1j]
-  return corners + n*edge_even + (n-1)*edge_odd + middle_even*n**2 + middle_odd*(n - 1)**2
+class Brick(NamedTuple):
+  x: int
+  y: int
+  z: int
+  x2: int
+  y2: int
+  z2: int
 
-@dataclass
-class Reachable:
-  cur: Set[complex]
-  seen: Set[complex]
+  @property
+  def voxels(self):
+    assert self.x <= self.x2 and self.y <= self.y2 and self.z <= self.z2
+    return [
+      (xx,yy,zz)
+      for xx,yy,zz in product(
+        range(self.x, self.x2+1),
+        range(self.y, self.y2+1),
+        range(self.z, self.z2+1)
+      )
+    ]
 
-  def step(self, rocks, w, h):
-    return dataclass_replace(
-      self,
-      cur={
-        p + q
-        for p in self.cur
-        for q in [1, 1j, -1, -1j]
-        if (p + q).real%w + 1j*((p + q).imag%h) not in rocks
-        and (p + q) not in self.seen
-      },
-      seen=self.cur | self.seen,
+  def shift(self, dx=0, dy=0, dz=0):
+    return self._replace(
+      x=self.x+dx, x2=self.x2+dx,
+      y=self.y+dy, y2=self.y2+dy,
+      z=self.z+dz, z2=self.z2+dz
     )
 
-  def __iter__(self):
-    yield from self.cur
-    p = next(iter(self.cur))
-    parity = (p.real + p.imag) % 2
-    yield from (p for p in self.seen if (p.real + p.imag) % 2 == parity)
-
-  def __len__(self):
-    return sum(1 for i in self)
-
-  def __str__(self):
-    grid = self.cur | self.seen_cur_parity
-    startx = min(int(p.real) for p in grid)
-    starty = min(int(p.imag) for p in grid)
-    stopx = 1 + max(int(p.real) for p in grid)
-    stopy = 1 + max(int(p.imag) for p in grid)
-    return '\n'.join(''.join('O' if x + 1j*y in grid else '.' for x in range(startx, stopx)) for y in range(starty, stopy))
-
 raw = '''
-...........
-.....###.#.
-.###.##..#.
-..#.#...#..
-....#.#....
-.##..S####.
-.##..#...#.
-.......##..
-.##.#.####.
-.##..##.##.
-...........
+1,0,1~1,2,1
+0,0,2~2,0,2
+0,2,3~2,2,3
+0,0,4~0,2,4
+2,0,5~2,2,5
+0,1,6~2,1,6
+1,1,8~1,1,9
 '''.strip('\n')
 
 if __name__ == '__main__':
